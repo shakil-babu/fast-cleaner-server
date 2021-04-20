@@ -23,6 +23,7 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@clu
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 client.connect(err => {
   const reviewCollection = client.db(`${process.env.DB_NAME}`).collection(`${process.env.DB_COLLECTION}`);
+  const servicesCollection = client.db(`${process.env.DB_NAME}`).collection(`servicesCollection`);
   console.log(err)
 
 
@@ -43,6 +44,27 @@ app.get('/reviewInfo', (req, res) => {
       res.send(documents)
   })
 })
+
+
+// insert services data
+app.post('/addService', (req, res) => {
+  const flower = req.body ;
+  console.log(flower);
+  servicesCollection.insertOne(flower)
+  .then(result => {
+      res.send(result.insertedCount > 0)
+      console.log(result);
+  })
+})
+
+
+app.get('/servicesInfo', (req, res) => {
+  servicesCollection.find({})
+  .toArray((error, documents) => {
+      res.send(documents)
+  })
+})
+
 
 });
 
