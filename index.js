@@ -24,6 +24,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 client.connect(err => {
   const reviewCollection = client.db(`${process.env.DB_NAME}`).collection(`${process.env.DB_COLLECTION}`);
   const servicesCollection = client.db(`${process.env.DB_NAME}`).collection(`servicesCollection`);
+  const adminCollection = client.db(`${process.env.DB_NAME}`).collection(`adminCollection`);
   console.log(err)
 
 
@@ -57,11 +58,31 @@ app.post('/addService', (req, res) => {
   })
 })
 
-
+// get service info
 app.get('/servicesInfo', (req, res) => {
   servicesCollection.find({})
   .toArray((error, documents) => {
       res.send(documents)
+  })
+})
+
+
+// add admin
+app.post('/makeAdmin', (req, res) => {
+  const admins = req.body ;
+  adminCollection.insertOne(admins)
+  .then(result => {
+    res.send(result.insertedCount > 0)
+    console.log(result);
+  })
+})
+
+
+// admin info
+app.post('/isAdmin', (req, res) => {
+  adminCollection.find({email: req.body.email})
+  .toArray((error, documents) => {
+      res.send(documents.length > 0)
   })
 })
 
